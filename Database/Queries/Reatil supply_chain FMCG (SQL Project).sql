@@ -1,0 +1,82 @@
+Create database project;
+Use Project;
+Create table Customers (customer_id int primary key, name varchar(50), email varchar(50), city varchar(30), signup_date date);
+Create table products (product_id int primary key, name varchar(100), category varchar(50), price decimal(10,2), stock_quantity int);
+Create table Purchases (purcahse_id int primary key, product_id int, purchase_date date, quantity int, cost_per_unit Decimal(10,2), 
+Foreign key (product_id) references products (product_id));
+Create table sales (sale_id int primary key, customer_id int, product_id int, sale_date date, quantity int, total_amount decimal(10,2),
+Foreign key (customer_id) references customers (customer_id), Foreign key (product_id) references products (product_id));
+
+INSERT INTO customers VALUES (1, 'Ravi Kumar', 'ravi@example.com', 'Bangalore', '2023-01-15'),(2, 'Neha Sharma', 'neha@example.com', 'Hyderabad', '2023-03-22'),
+(3, 'Amit Joshi', 'amit@example.com', 'Chennai', '2023-04-05'),(4, 'Kavita Mehra', 'kavita@example.com', 'Mumbai', '2023-05-10'),(5, 'Suresh Reddy', 'suresh@example.com', 'Delhi', '2023-06-01'),
+(6, 'Priya Das', 'priya@example.com', 'Kolkata', '2023-07-12'),(7, 'Anil Gupta', 'anil@example.com', 'Pune', '2023-08-08'),(8, 'Divya Patel', 'divya@example.com', 'Ahmedabad', '2023-09-15'),
+(9, 'Rajeev Nair', 'rajeev@example.com', 'Cochin', '2023-10-10'),(10, 'Meena Rao', 'meena@example.com', 'Mysore', '2023-11-20');
+
+Insert into products values(101, 'Amul Butter 500g', 'Dairy', 240.00, 100),(102, 'Tata Salt 1kg', 'Grocery', 28.00, 200),
+(103, 'Colgate Toothpaste 200g', 'Personal Care', 95.00, 150),(104, 'Parle-G Biscuits 300g', 'Snacks', 40.00, 180),(105, 'Dettol Handwash 200ml', 'Personal Care', 80.00, 120),
+(106, 'Aashirvaad Atta 5kg', 'Grocery', 230.00, 130),(107, 'Maggi Noodles 70g', 'Snacks', 15.00, 300),(108, 'Dove Shampoo 180ml', 'Personal Care', 130.00, 100),
+(109, 'Nestle Milk 1L', 'Dairy', 60.00, 90),(110, 'Good Day Cookies 250g', 'Snacks', 50.00, 110);
+
+INSERT INTO purchases VALUES(201, 101, '2024-01-10', 150, 210.00),(202, 102, '2024-01-12', 300, 24.00),(203, 103, '2024-01-15', 200, 80.00),
+(204, 104, '2024-01-18', 250, 32.00),(205, 105, '2024-01-20', 180, 65.00),(206, 106, '2024-01-25', 160, 200.00),(207, 107, '2024-01-30', 500, 12.00),
+(208, 108, '2024-02-02', 120, 110.00),(209, 109, '2024-02-05', 100, 50.00),(210, 110, '2024-02-10', 130, 42.00);
+
+INSERT INTO sales VALUES (301, 1, 101, '2024-03-01', 2, 480.00),(302, 2, 104, '2024-03-01', 3, 120.00),(303, 3, 106, '2024-03-03', 1, 230.00),
+(304, 4, 108, '2024-03-04', 2, 260.00),(305, 5, 102, '2024-03-05', 5, 140.00),(306, 6, 107, '2024-03-06', 6, 90.00),(307, 7, 103, '2024-03-06', 2, 190.00),
+(308, 8, 109, '2024-03-07', 1, 60.00),(309, 9, 105, '2024-03-08', 3, 240.00),(310, 10, 110, '2024-03-08', 4, 200.00);
+
+Select count(*) as total_customers From Customers; #no. of customers
+Select name,price from products;# price and names of products
+select Sum(total_amount) as Total_sales from sales;# Total sales/revenue 
+select product_id, sum(quantity) as total_quantity_sold from sales group by product_id;#Total qty sold by product
+select customer_id, sum(total_amount) as Customer_total_spend from sales group by customer_id; #Customerwise sales
+Select name, stock_quantity from products where stock_quantity <100; #product less than 100 quantity
+Select product_id, max(purchase_date) as last_purchase_date from purchases group by product_id; #Most Recent Purchase_date per Product
+Select c.city, count(s.sale_id) as sales_count from sales s join customers c on s.customer_id=c.customer_id group by c.city; #no. of sales per city
+Select avg(Total_amount) as avg_sale_amount from sales; #avg sale amount
+select s.sale_id, p.name as product_name, s.quantity, s.total_amount from sales s Join products p on s.product_id=p.product_id; #sales with product name
+Select customer_id, count(*) as purcahse_count from sales group by customer_id Having Count(*)>1; #customers purchasing more than 1 time
+Select p.name as product_name from products p left join sales s on p.product_id=s.product_id where s.product_id is null; #products never sold
+Select * from customers where city='Bangalore'; #customers from bangalore
+Select name, price from products order by price desc limit 1; #most expenisve product
+SELECT name, MAX(price) AS max_price FROM products GROUP BY name; #most expenisve product with max
+Select * from sales where sale_date between '2024-03-01' AND '2024-03-31'; #saes b/w 2 dates
+Select p.name as product_name, s.quantity from sales s Join products p on s.product_id=p.product_id; #no of products sold
+Select category, count(*) as total_products from products group by category; #Total Number of Products in Each Category
+Select * from products where price between 50 and 200; #products between 50 and 200
+Select city, count(*) as total_customers from customers group by city order by total_customers Desc limit 5;#Top 5 Cities by Number of Customers
+Select * from customers where year(signup_date) =2023; #Customers Who Signed Up in 2023
+Select name from products where name like "A%"; #Products That Start with 'A'
+Select category, sum(stock_quantity*price) as stock_value from products group by category; #Total Stock Value per Category
+Select Sum(stock_quantity*price) as Stock_value from products; #Total stock value
+Select * from sales Order by sale_date desc limit 5;#Last 5 Sales (Latest Transactions)
+Select p.name, count(s.sale_id) as times_sold from products p left join sales s on p.product_id=s.product_id group by p.product_id; #List Products and How Many Times Each Was Sold
+Select avg(quantity) as Avg_units_per_sale from sales;# Avg units per sale
+Select name, price, stock_quantity from products where category like 'personal%'; # products in the 'personalcare' category
+Select sale_date, sum(quantity) as total_units_sold from sales group by sale_date order by sale_date; #total units sold per day
+Select distinct c.name from sales s join customers c on s.customer_id=c.customer_id where s.total_amount > 200;#customer names who made purchases of more than ₹200
+Select name, price from products where price > (Select avg(price) from products); #product names with prices above average price
+Select product_id, count(*) as times_purchased from purchases group by product_id; #Count of purchases made for each product
+Select * from customers where name like "r%";
+Select distinct city from customers;#List distinct cities where customers are from
+
+#Top selling products by quantity
+Select p.name as product_name, Sum(s.quantity) as total_quantity_sold from sales s Join products p on s.product_id=p.product_id
+Group by p.product_id order by total_quantity_sold desc	limit 5;
+
+#Customers with Highest Total Purchase Amount
+select c.name AS customer_name, SUM(s.total_amount) AS total_spent from sales s join customers c on s.customer_id=c.customer_id
+Group by c.customer_id order by total_spent Desc limit 5;
+
+#Stock Value in Inventory
+select name as product_name, stock_quantity, price as Selling_price, (stock_quantity*price) as stock_value from products
+Order by stock_value desc;
+
+#Monthly Sales Report (Total Sales per Month)
+Select Date_format(sale_date, '%y-%m') as month, Sum(total_amount) as total_sales, sum(quantity) as total_units_sold from sales
+group by date_format(sale_date, '%y-%m') order by month;
+
+#Profit Margin per Product
+Select p.name as product_name, p.price as selling_price, Avg(pr.cost_per_unit) as avg_purchase_cost, (p.price-AVG(pr.cost_per_unit))as profit_per_unit,
+Sum(s.quantity) as total_units_sold,(p.price-AVG(pr.cost_per_unit))* Sum(s.quantity) as total_profit from sales s
+Join products p ON s.product_id = p.product_id JOIN purchases pr ON pr.product_id = p.product_id GROUP BY p.product_id ORDER BY total_profit DESC;
